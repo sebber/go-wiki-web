@@ -14,15 +14,18 @@ import(
 var repo = repository.MemoryWikipageRepository{}
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
-  title := r.URL.Path[len("/view/"):]
+  vars := mux.Vars(r)
+  title := vars["title"]
+
   p, _ := repo.GetByTitle(title)
 
-  fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
+  //fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
+  renderTemplate(w, "view", p)
 }
 
-func createHandler(w http.ResponseWriter, r *http.Request) {
+//func createHandler(w http.ResponseWriter, r *http.Request) {
 
-}
+//}
 
 func setup() {
   repo.Pages = make(map[string]*entity.Page)
@@ -34,9 +37,9 @@ func main() {
   setup()
 
   r := mux.NewRouter()
-  r.HandleFunc("/", viewHandler)
-  http.ListenAndServe(":8080", nil)
+  r.HandleFunc("/view/{title}", viewHandler)
   http.Handle("/", r)
+  http.ListenAndServe(":8080", nil)
 }
 
 
@@ -44,16 +47,17 @@ type PageView struct {
   Content *entity.Page
 }
 
-func (page Page) Title() string {
+func (page PageView) Title() string {
   return page.Content.Title
 }
 
-func (page Page) Body() string {
+func (page PageView) Body() string {
   return string(page.Content.Body)
 }
 
+
 func renderTemplate(w http.ResponseWriter, tmpl string, p *entity.Page) {
-  view := view.Page{Content: p}
+  view := PageView{Content: p}
   output := mustache.RenderFile("templates/"+tmpl+".mustache", view)
   fmt.Fprintf(w, output)
 }
