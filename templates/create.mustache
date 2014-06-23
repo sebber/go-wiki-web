@@ -1,1 +1,18 @@
-<h1>{{ Title }}</h1>
+{{> header}}
+
+<h1>Create new page</h1>
+
+<form action="/view/save" method="post">
+  <p>
+    <input type="text" id="Title" name="Title" placeholder="Title">
+  </p>
+  <p>
+    <textarea id="Title" name="Body" placeholder="">
+    </textarea>
+  </p>
+  <p>
+    <button type="submit">Save page</button>
+  </p>
+</form>
+
+{{> footer}}
